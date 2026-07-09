@@ -85,6 +85,30 @@
   }
   .hidden{display:none !important;}
 
+  #highscore-panel{
+    margin-bottom:16px;
+    padding:14px 22px;
+  }
+  #highscore-panel summary{
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    font-size:17px;
+    cursor:pointer;
+    list-style:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  #highscore-panel summary::-webkit-details-marker{display:none;}
+  #highscore-panel summary::after{
+    content:'▾';
+    font-size:14px;
+    color:var(--gold-deep);
+    transition:transform .15s ease;
+  }
+  #highscore-panel[open] summary::after{transform:rotate(180deg);}
+  #highscore-panel .highscore-list{margin-top:10px;}
+
   /* ---------- Setup screen ---------- */
   #setup-screen h2{
     font-family:'Fraunces',serif;
@@ -375,14 +399,14 @@
   .standings .rank{font-family:'JetBrains Mono',monospace;color:var(--gold-deep);margin-right:10px;}
   .standings .pts{font-family:'JetBrains Mono',monospace;}
 
-  #highscore-list{list-style:none;padding:0;margin:0;}
-  #highscore-list li{
+  .highscore-list{list-style:none;padding:0;margin:0;}
+  .highscore-list li{
     display:flex;justify-content:space-between;
     padding:6px 10px;border-bottom:1px dashed #d9cba3;
     font-size:14px;
   }
-  #highscore-list li span.hs-name{font-weight:600;}
-  #highscore-list li span.hs-meta{color:var(--ink-soft); font-size:12px;}
+  .highscore-list li span.hs-name{font-weight:600;}
+  .highscore-list li span.hs-meta{color:var(--ink-soft); font-size:12px;}
 
   .end-actions{display:flex; gap:12px; justify-content:center; margin-top:20px; flex-wrap:wrap;}
 
@@ -408,6 +432,11 @@
     <h1>🎲 Maxi Yatzy</h1>
     <div class="tagline">Sex tärningar &middot; Tre kast &middot; Sparade kast med pluppar</div>
   </header>
+
+  <details id="highscore-panel" class="card" open>
+    <summary>🏆 Highscore (topp 10)</summary>
+    <ul class="highscore-list" id="highscore-list-live"></ul>
+  </details>
 
   <!-- ============ SETUP SCREEN ============ -->
   <section id="setup-screen" class="card">
@@ -449,7 +478,7 @@
     <ul class="standings" id="standings-list"></ul>
 
     <h2 style="font-size:20px;">All-time highscore</h2>
-    <ul id="highscore-list"></ul>
+    <ul class="highscore-list" id="highscore-list"></ul>
 
     <div class="end-actions">
       <button id="new-game-btn" class="gold-btn" type="button">Nytt spel</button>
@@ -875,16 +904,17 @@
 
   function renderHighscore(){
     const hs = loadHighscores().slice(0,10);
-    const el = document.getElementById('highscore-list');
-    el.innerHTML = '';
-    if(hs.length===0){
-      el.innerHTML = '<li>Inga resultat sparade ännu.</li>';
-      return;
-    }
-    hs.forEach((entry,i)=>{
-      const li = document.createElement('li');
-      li.innerHTML = `<span class="hs-name">${i+1}. ${escapeHtml(entry.name)}</span><span class="hs-meta">${entry.score} p &middot; ${entry.date}</span>`;
-      el.appendChild(li);
+    document.querySelectorAll('.highscore-list').forEach(el=>{
+      el.innerHTML = '';
+      if(hs.length===0){
+        el.innerHTML = '<li>Inga resultat sparade ännu.</li>';
+        return;
+      }
+      hs.forEach((entry,i)=>{
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="hs-name">${i+1}. ${escapeHtml(entry.name)}</span><span class="hs-meta">${entry.score} p &middot; ${entry.date}</span>`;
+        el.appendChild(li);
+      });
     });
   }
 
